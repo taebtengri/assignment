@@ -11,7 +11,9 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
   <!-- LINK TO FIREBASE GOES HERE -->
-  <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+  
+<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase.js"></script>
+
 
 </head>
 
@@ -71,7 +73,7 @@
                 <label for="role">Role</label>
                 <input class="form-control" id="role" type="text">
               </div>
-              <div class="form-group">
+              <div class="form-group">  
                 <label for="start-date">Start date:(DD/MM/YY - ex: 01/01/89)</label>
                 <input class="form-control" id="start-date" type="date">
               </div>
@@ -99,9 +101,52 @@
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery.js"></script>
 
+
   <!-- Script -->
   <script>
 
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCsH4IhTuv8Zi4tMrwL5raf7ShpoeY6My8",
+    authDomain: "employee-1822f.firebaseapp.com",
+    databaseURL: "https://employee-1822f.firebaseio.com",
+    storageBucket: "employee-1822f.appspot.com",
+    messagingSenderId: "1051155148310"
+  };
+  firebase.initializeApp(config);
+
+  var database = firebase.database();
+
+    // Initial Values
+    var name = "";
+    var role = "";
+    var startdate = 0;
+    var monthlyrate = 0;
+    var aaa = "2017-03-01";
+
+    // Capture Button Click
+    $("#add-user").on("click", function(event) {
+      event.preventDefault();
+
+      // Grabbed values from text-boxes
+      name = $("#name-input").val().trim();
+      role = $("#role").val().trim();
+      startdate = $("#start-date").val().trim();
+      monthlyrate = $("#monthly-rate").val().trim();
+
+      // Code for "Setting values in the database"
+      database.ref().push({
+        name: name,
+        role: role,
+        startdate: startdate,
+        monthlyrate: monthlyrate
+      });
+      console.log(startdate);
+      console.log(aaa + startdate);
+      var utc = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+      console.log(utc);
+    });
+  
   </script>
 
 </body>
