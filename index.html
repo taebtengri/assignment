@@ -35,7 +35,7 @@
           <div class="panel-heading">
             <h3 class="panel-title">Current Employees</h3>
           </div>
-          <table class="table table-striped">
+          <table class="table table-striped" id="table">
               <tr>
                   <th>Employee Name</th>
                   <th>Role</th>
@@ -48,6 +48,7 @@
               <tr> 
                  <td colspan="6"> <hr /> </td>      
               </tr>
+              
             
           </table>
         </div>
@@ -172,6 +173,28 @@
       
 
     });
+      var dataRef = firebase.database();
+      dataRef.ref().on("child_added", function(childSnapshot) {
+
+      // Log everything that's coming out of snapshot
+      console.log(childSnapshot.val().name);
+      console.log(childSnapshot.val().role);
+      console.log(childSnapshot.val().startdate);
+      console.log(childSnapshot.val().monthlyrate);
+      console.log(childSnapshot.val().monthsworked);
+      console.log(childSnapshot.val().totalpaid);
+
+
+      // full list of items to the well
+      $("#table").append('<tr><th>' + childSnapshot.val().name + '</th><th>' + childSnapshot.val().role + '</th><th>' + childSnapshot.val().startdate
+      + '</th><th>' + childSnapshot.val().monthsworked + '</th><th>' + childSnapshot.val().monthlyrate + '</th><th>' + childSnapshot.val().totalpaid + '</th></tr>'  );
+
+    // Handle the errors
+    }, function(errorObject) {
+      console.log("Errors handled: " + errorObject.code);
+    });
+
+    
 
   
   
