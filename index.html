@@ -5,14 +5,15 @@
 <head>
 
   <meta charset="UTF-8">
-  <title>Employee Data Management</title>
+  <title>Train schedule</title>
 
   <!-- Bootstrap -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-  <!-- LINK TO FIREBASE GOES HERE -->
+
   
 <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 
 
 </head>
@@ -23,9 +24,9 @@
 
     <br>
 
-    <!-- Jumbotron -->
+
     <div class="jumbotron">
-      <h1 class="text-center">Employee Data Management</h1>
+      <h1 class="text-center">All you had to do was follow the damn train CJ</h1>
     </div>
 
     <div class="row">
@@ -33,16 +34,16 @@
     <div class="col-lg-12">
         <div class="panel panel-primary">
           <div class="panel-heading">
-            <h3 class="panel-title">Current Employees</h3>
+            <h3 class="panel-title">Current Trains</h3>
           </div>
           <table class="table table-striped" id="table">
               <tr style=" color: red">
-                  <th>Employee Name</th>
-                  <th>Role</th>
-                  <th>Start Date</th>
-                  <th>Months worked</th>
-                  <th>Monthly rate</th>
-                  <th>Total Billed ($)</th>
+                  <th>Train Name</th>
+                  <th>Destination</th>
+                  <th>Frequency(min)</th>
+                  <th>Next Arrival</th>
+                  <th>Minutes away</th>
+                 
                   
               </tr>
               <!-- <tr> 
@@ -59,7 +60,7 @@
       <div class="col-lg-12">
         <div class="panel panel-primary">
           <div class="panel-heading">
-            <h3 class="panel-title">Add Employees</h3>
+            <h3 class="panel-title">Add Trains</h3>
           </div>
           <div class="panel-body">
 
@@ -67,20 +68,20 @@
 
             <form role="form">
               <div class="form-group">
-                <label for="name-input">Employee name:</label>
+                <label for="name-input">Train name:</label>
                 <input class="form-control" id="name-input" type="text">
               </div>
               <div class="form-group">
-                <label for="role">Role</label>
-                <input class="form-control" id="role" type="text">
+                <label for="role">Destination:</label>
+                <input class="form-control" id="destination" type="text">
               </div>
               <div class="form-group">  
-                <label for="start-date">Start date:(DD/MM/YY - ex: 01/01/89)</label>
-                <input class="form-control" id="start-date" type="date">
+                <label for="first-time">First train time (hh:mm military time):</label>
+                <input class="form-control" id="first-time" type="text">
               </div>
               <div class="form-group">
-                <label for="monthly-rate">Monthly rate</label>
-                <input class="form-control" id="monthly-rate" type="number">
+                <label for="frequency">Frequency (min):</label>
+                <input class="form-control" id="frequency" type="number">
               </div>
 
               <button class="btn btn-default" id="add-user" type="submit">Submit</button>
@@ -118,28 +119,29 @@
 
   var database = firebase.database();
 
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1; //January is 0!
-    var yyyy = today.getFullYear();
+
 
     
 
-      today = yyyy+'-'+mm+'-'+dd;
-    console.log(today);
-    console.log(yyyy);
-    console.log(mm);
+
 
     // Initial Values
     var name = "";
-    var role = "";
-    var startdate = 0;
-    var monthlyrate = 0;
-    var aaa = "2017-03-01";
-    var totalpaid = 0;
-    var monthsworked = 0;
-    var years;
-    var months;
+    var destination = "";
+    var firsttime = "";
+    var frequency = 0;
+    var hours = 0;
+    var minutes = 0;
+    var nextarrival = "";
+    var away = 0;
+    var now;
+
+    var nhours = 0;
+    var nminutes = 0;
+    var dat;
+    var dif;
+    
+    
 
     // Capture Button Click
     $("#add-user").on("click", function(event) {
@@ -147,29 +149,51 @@
 
       // Grabbed values from text-boxes
       name = $("#name-input").val().trim();
-      role = $("#role").val().trim();
-      startdate = $("#start-date").val().trim();
-      monthlyrate = $("#monthly-rate").val().trim();
-      years = Number(startdate.slice(0, 4));
-      console.log(years);
-      months = Number(startdate.slice(5, 7));
-      console.log(months);
-      monthsworked = (yyyy - years)*12 + mm - months;
-      totalpaid = monthsworked*monthlyrate;
+      destination = $("#destination").val().trim();
+      firsttime = $("#first-time").val().trim();
+      frequency = $("#frequency").val().trim();
+      hours = Number(firsttime.slice(0, 2));
+      console.log(hours);
+      minutes = Number(firsttime.slice(3, 5));
+      console.log(minutes);
+      dat = moment().hour(hours).minute(minutes).format("HH:mm");
+      console.log(dat);
+
+
+
+
+
+
+      now = moment().format("HH:mm");
+     
+      nhours = Number(now.slice(0, 2));
+      console.log(nhours);
+      nminutes = Number(now.slice(3, 5));
+      console.log(nminutes);
+      now = moment().hour(nhours).minute(nminutes).format("HH:mm");
+     dif = moment().diff(moment().hour(hours).minute(minutes), 'minutes');
+     console.log(dif + " min")
+     dif = Math.abs(Number(dif));
+     away = dif%frequency + dif;
+    nextarrival = moment().add(dif, 'minutes').format("HH:mm");
+      
+
+      //monthsworked = (yyyy - years)*12 + mm - months;
+      //totalpaid = monthsworked*monthlyrate;
 
 
       // Code for "Setting values in the database"
       database.ref().push({
         name: name,
-        role: role,
-        startdate: startdate,
-        monthlyrate: monthlyrate,
-        monthsworked: monthsworked,
-        totalpaid: totalpaid,
+        destination: destination,
+        firsttime: firsttime,
+        frequency: frequency,
+          nextarrival: nextarrival,
+          away: away,
         dateAdded : firebase.database.ServerValue.TIMESTAMP
       });
-      console.log(startdate);
-      console.log(aaa + startdate);
+      console.log(firsttime);
+      
       
 
     });
@@ -178,16 +202,16 @@
 
       // Log everything that's coming out of snapshot
       console.log(childSnapshot.val().name);
-      console.log(childSnapshot.val().role);
-      console.log(childSnapshot.val().startdate);
-      console.log(childSnapshot.val().monthlyrate);
-      console.log(childSnapshot.val().monthsworked);
-      console.log(childSnapshot.val().totalpaid);
+      console.log(childSnapshot.val().destination);
+      console.log(childSnapshot.val().firsttime);
+      console.log(childSnapshot.val().frequency);
+      console.log(childSnapshot.val().nextarrival);
+      console.log(childSnapshot.val().away);
 
 
       // full list of items to the well
-      $("#table").append('<tr><th>' + childSnapshot.val().name + '</th><th>' + childSnapshot.val().role + '</th><th>' + childSnapshot.val().startdate
-      + '</th><th>' + childSnapshot.val().monthsworked + '</th><th>' + childSnapshot.val().monthlyrate + '</th><th>' + childSnapshot.val().totalpaid + '</th></tr>'  );
+      $("#table").append('<tr><th>' + childSnapshot.val().name + '</th><th>' + childSnapshot.val().destination + '</th><th>' + childSnapshot.val().frequency
+      + '</th><th>' + childSnapshot.val().nextarrival + '</th><th>' + childSnapshot.val().away +  '</th></tr>'  );
 
     // Handle the errors
     }, function(errorObject) {
